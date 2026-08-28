@@ -77,8 +77,9 @@ function parseAmount(value) {
   return parseFloat(value.replace(",", "."));
 }
 
-function buildDescription(kategori, korteier, bilag, beskrivelse) {
+function buildDescription(nummer, kategori, korteier, bilag, beskrivelse) {
   const parts = [];
+  parts.push(`Folio # ${nummer}`);
   if (kategori) parts.push(kategori);
   parts.push(korteier);
   parts.push(`Bilag: ${bilag}`);
@@ -159,12 +160,13 @@ function transform(text, defaultAccount) {
     if (!debetkto) debetkto = defaultAccount;
     if (!kreditkto) kreditkto = defaultAccount;
 
+    const nummer = fields[col["#"]];
     const korteier = fields[col["Korteier"]];
     const bilag = fields[col["Bilag"]];
     const kategori = fields[col["Kategori"]];
     const beskrivelse = fields[col["Beskrivelse"]];
 
-    const description = buildDescription(kategori, korteier, bilag, beskrivelse);
+    const description = buildDescription(nummer, kategori, korteier, bilag, beskrivelse);
 
     const debetRow = [
       "GBAT10", voucherNumber, date, "", "", "",
