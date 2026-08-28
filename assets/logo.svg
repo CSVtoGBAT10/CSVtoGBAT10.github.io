@@ -1,0 +1,13 @@
+<svg viewBox="0 0 240 60" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>CSV to GBAT10 logo</title>
+<desc>A spreadsheet icon with grid lines, an arrow, and the wordmark GBAT10</desc>
+<rect x="4" y="10" width="40" height="40" rx="6" fill="#ffffff" stroke="#111111" stroke-width="2.5"/>
+<line x1="4" y1="24" x2="44" y2="24" stroke="#111111" stroke-width="1.5"/>
+<line x1="4" y1="37" x2="44" y2="37" stroke="#111111" stroke-width="1.5"/>
+<line x1="17" y1="10" x2="17" y2="50" stroke="#111111" stroke-width="1.5"/>
+<line x1="30" y1="10" x2="30" y2="50" stroke="#111111" stroke-width="1.5"/>
+<rect x="17" y="24" width="13" height="13" fill="var(--accent-color, #4f46e5)"/>
+<path d="M52 30 H72" stroke="#111111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+<path d="M65 22 L73 30 L65 38" stroke="#111111" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="82" y="38" font-family="-apple-system, Helvetica Neue, Arial, sans-serif" font-size="24" font-weight="700" fill="#111111">GBAT10</text>
+</svg>
