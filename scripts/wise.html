@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wise - CSVtoGBAT10</title>
+<link rel="stylesheet" href="../assets/core.css">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+</head>
+<body>
+<nav class="topnav">
+  <div class="topnav-inner">
+    <a class="brand" href="../index.html">
+      <img src="../assets/logo.svg" alt="GBAT10 Importers" height="32">
+    </a>
+    <div class="topnav-links">
+      <a href="../index.html" data-en="All tools" data-no="Alle verktøy">All tools</a>
+      <a href="../about.html" data-en="About" data-no="Om">About</a>
+      <a href="../faq.html" data-en="FAQ" data-no="FAQ">FAQ</a>
+      <div class="lang-switch">
+        <button class="lang-btn" id="langBtn" aria-label="Change language"></button>
+        <div class="lang-menu" id="langMenu">
+          <button data-lang="en">English</button>
+          <button data-lang="no">Norsk</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="page-shell">
+  <h1 data-en="Wise to GBAT10" data-no="Wise til GBAT10">Wise to GBAT10</h1>
+  <p class="lede" data-en="Convert a Wise account statement CSV export into a Tripletex GBAT10 import file." data-no="Konverter en Wise kontoutskrift-CSV til en Tripletex GBAT10-importfil.">Convert a Wise account statement CSV export into a Tripletex GBAT10 import file.</p>
+
+  <div class="info-panel">
+    <h3 data-en="About Wise" data-no="Om Wise">About Wise</h3>
+    <p data-en="Wise account statements list transactions with amounts, descriptions, and payee names, but not in a format Tripletex can import directly. This tool converts a Wise CSV statement into GBAT10, letting you assign a GL account and, where relevant, a customer or supplier account number to each counterparty. Export the statement for one currency at a time — a file containing multiple currencies will produce incorrect amounts." data-no="Wise-kontoutskrifter viser transaksjoner med beløp, beskrivelser og mottakernavn, men ikke i et format Tripletex kan importere direkte. Dette verktøyet konverterer en Wise CSV-utskrift til GBAT10, og lar deg tilordne en konto og, der relevant, et kunde- eller leverandørnummer til hver motpart. Eksporter utskriften for én valuta om gangen — en fil med flere valutaer vil gi feil beløp.">Wise account statements list transactions with amounts, descriptions, and payee names, but not in a format Tripletex can import directly. This tool converts a Wise CSV statement into GBAT10, letting you assign a GL account and, where relevant, a customer or supplier account number to each counterparty. Export the statement for one currency at a time — a file containing multiple currencies will produce incorrect amounts.</p>
+    <ol>
+      <li data-en="In Wise, download your account statement as a CSV, in English (UK), for one currency at a time." data-no="Last ned kontoutskriften som CSV i Wise, på engelsk (UK), for én valuta om gangen.">In Wise, download your account statement as a CSV, in English (UK), for one currency at a time.</li>
+      <li data-en="Upload the CSV below and set the account for each counterparty when prompted." data-no="Last opp CSV-filen under og angi konto for hver motpart når du blir spurt.">Upload the CSV below and set the account for each counterparty when prompted.</li>
+      <li data-en="Download the resulting GBAT10 file and upload it to Tripletex." data-no="Last ned den resulterende GBAT10-filen og last den opp til Tripletex.">Download the resulting GBAT10 file and upload it to Tripletex.</li>
+    </ol>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label" data-en="Step 1 — Upload CSV" data-no="Steg 1 — Last opp CSV">Step 1 — Upload CSV</div>
+    <input type="file" id="fileInput" accept=".csv">
+  </div>
+
+  <div class="panel">
+    <div class="panel-label" data-en="Step 2 — Settings" data-no="Steg 2 — Innstillinger">Step 2 — Settings</div>
+    <label for="bankAccount" data-en="GL number of bank account" data-no="Kontonummer for bankkonto">GL number of bank account</label>
+    <input type="text" id="bankAccount" value="1920">
+  </div>
+
+  <div class="panel" id="counterpartyPanel" style="display:none;">
+    <div class="panel-label" data-en="Step 3 — Assign counterparty accounts" data-no="Steg 3 — Tilordne motpartskontoer">Step 3 — Assign counterparty accounts</div>
+    <p data-en="Please insert GL number and ledger number for the following transactions:" data-no="Vennligst oppgi kontonummer og reskontronummer for følgende transaksjoner:">Please insert GL number and ledger number for the following transactions:</p>
+    <div id="counterpartyList"></div>
+    <p id="counterpartyError" style="display:none;color:#c0392b;"></p>
+    <button id="applyCounterparties" data-en="Continue" data-no="Fortsett">Continue</button>
+  </div>
+
+  <div class="panel">
+    <div class="panel-label" data-en="Step 4 — Download result" data-no="Steg 4 — Last ned resultat">Step 4 — Download result</div>
+    <button id="downloadBtn" disabled data-en="Download GBAT10 CSV" data-no="Last ned GBAT10 CSV">Download GBAT10 CSV</button>
+  </div>
+</main>
+<footer>
+  <div class="copyright">
+    <span data-en="Designed by" data-no="Designet av">Designed by</span> <a href="https://nikitas.no/" target="_blank">Nikitas</a> <span data-en="© All Rights Reserved 2026" data-no="© Alle rettigheter forbeholdt 2026">© All Rights Reserved 2026</span>
+  </div>
+  <div class="social-icons">
+    <a href="https://www.linkedin.com/in/filipnmlog/" target="_blank">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+  </div>
+</footer>
+<script src="../assets/lang.js"></script>
+<script>
+let outputCsv = null;
+let outputFileName = "gbat10_output.txt";
+let parsedRows = [];
+let counterpartyAssignments = {};
+
+window.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("fileInput").value = "";
+});
+
+const REQUIRED_HEADERS = ["Date", "Amount", "Description", "Payee Name"];
+
+const I18N = {
+  en: {
+    colDescription: "Description",
+    colGlNumber: "GL number",
+    colGlType: "GL type",
+    colLedgerNumber: "Ledger number",
+    phGlNumber: "GL number",
+    phLedgerNumber: "Ledger number",
+    phCustomerNumber: "Customer number",
+    phSupplierNumber: "Supplier number"
+  },
+  no: {
+    colDescription: "Beskrivelse",
+    colGlNumber: "Kontonummer",
+    colGlType: "Kontotype",
+    colLedgerNumber: "Reskontronummer",
+    phGlNumber: "Kontonummer",
+    phLedgerNumber: "Reskontronummer",
+    phCustomerNumber: "Kundenummer",
+    phSupplierNumber: "Leverandørnummer"
+  }
+};
+
+function currentLang() {
+  return (localStorage.getItem("lang") === "no") ? "no" : "en";
+}
+
+function parseCsvLine(line) {
+  const result = [];
+  let current = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (inQuotes) {
+      if (char === '"') {
+        if (line[i + 1] === '"') {
+          current += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        current += char;
+      }
+    } else {
+      if (char === '"') {
+        inQuotes = true;
+      } else if (char === ",") {
+        result.push(current);
+        current = "";
+      } else {
+        current += char;
+      }
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+function formatGbatAmount(value) {
+  return value.toFixed(2);
+}
+
+function encodeIso88591(str) {
+  const bytes = new Uint8Array(str.length);
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    bytes[i] = code <= 0xFF ? code : 0x3F;
+  }
+  return bytes;
+}
+
+function counterpartyKey(fields, col) {
+  const payee = fields[col["Payee Name"]];
+  if (payee) return payee;
+  return fields[col["Description"]];
+}
+
+function parseWiseCsv(text) {
+  const lines = text.split(/\r?\n/).filter(line => line.length > 0);
+  const header = parseCsvLine(lines[0]);
+
+  const col = {};
+  header.forEach((name, idx) => { col[name] = idx; });
+
+  const missing = REQUIRED_HEADERS.filter(h => !(h in col));
+  if (missing.length > 0) {
+    alert("This CSV is missing required columns: " + missing.join(", ") + ". Please re-extract the statement from Wise in English (UK) and try again.");
+    return null;
+  }
+
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const fields = parseCsvLine(lines[i]);
+    if (fields.length < header.length) continue;
+
+    const dateRaw = fields[col["Date"]];
+    const dateParts = dateRaw.split("-");
+    const date = dateParts.length === 3 ? dateParts[2] + dateParts[1] + dateParts[0] : dateRaw.replace(/-/g, "");
+
+    const amount = parseFloat(fields[col["Amount"]]);
+    const description = fields[col["Description"]];
+    const key = counterpartyKey(fields, col);
+
+    rows.push({ date, amount, description, key });
+  }
+
+  return rows;
+}
+
+function getUniqueCounterparties(rows) {
+  const seen = new Set();
+  const list = [];
+  rows.forEach(row => {
+    if (!seen.has(row.key)) {
+      seen.add(row.key);
+      list.push(row.key);
+    }
+  });
+  return list;
+}
+
+function renderCounterpartyPanel(keys) {
+  const t = I18N[currentLang()];
+  const container = document.getElementById("counterpartyList");
+  container.innerHTML = "";
+  container.className = "counterparty-table";
+
+  const headers = [t.colDescription, t.colGlNumber, t.colGlType, t.colLedgerNumber];
+  headers.forEach(text => {
+    const cell = document.createElement("div");
+    cell.className = "counterparty-header-cell";
+    cell.textContent = text;
+    container.appendChild(cell);
+  });
+
+  keys.forEach((key, idx) => {
+    const descCell = document.createElement("div");
+    descCell.className = "counterparty-cell";
+    descCell.textContent = key;
+    container.appendChild(descCell);
+
+    const glCell = document.createElement("div");
+    glCell.className = "counterparty-cell";
+    const glInput = document.createElement("input");
+    glInput.type = "text";
+    glInput.id = "glNumber_" + idx;
+    glInput.placeholder = t.phGlNumber;
+    glCell.appendChild(glInput);
+    container.appendChild(glCell);
+
+    const typeCell = document.createElement("div");
+    typeCell.className = "counterparty-cell";
+    const ledgerSelect = document.createElement("select");
+    ledgerSelect.id = "ledgerType_" + idx;
+    ["GL", "AP", "AR"].forEach(type => {
+      const opt = document.createElement("option");
+      opt.value = type;
+      opt.textContent = type;
+      ledgerSelect.appendChild(opt);
+    });
+    typeCell.appendChild(ledgerSelect);
+    container.appendChild(typeCell);
+
+    const ledgerCell = document.createElement("div");
+    ledgerCell.className = "counterparty-cell";
+    const ledgerNumberInput = document.createElement("input");
+    ledgerNumberInput.type = "text";
+    ledgerNumberInput.id = "ledgerNumber_" + idx;
+    ledgerNumberInput.placeholder = t.phLedgerNumber;
+    ledgerNumberInput.style.display = "none";
+    ledgerCell.appendChild(ledgerNumberInput);
+    container.appendChild(ledgerCell);
+
+    ledgerSelect.addEventListener("change", function () {
+      const lt = I18N[currentLang()];
+      if (ledgerSelect.value === "GL") {
+        ledgerNumberInput.style.display = "none";
+        ledgerNumberInput.value = "";
+      } else {
+        ledgerNumberInput.style.display = "";
+        ledgerNumberInput.placeholder = ledgerSelect.value === "AR" ? lt.phCustomerNumber : lt.phSupplierNumber;
+      }
+    });
+  });
+
+  document.getElementById("counterpartyPanel").style.display = "block";
+}
+
+function collectCounterpartyAssignments(keys) {
+  const errors = [];
+  const assignments = {};
+
+  keys.forEach((key, idx) => {
+    const glNumber = document.getElementById("glNumber_" + idx).value.trim();
+    const ledgerType = document.getElementById("ledgerType_" + idx).value;
+    const ledgerNumber = document.getElementById("ledgerNumber_" + idx).value.trim();
+
+    if (!glNumber) {
+      errors.push(`"${key}": GL number is required.`);
+    }
+    if ((ledgerType === "AR" || ledgerType === "AP") && !ledgerNumber) {
+      errors.push(`"${key}": ${ledgerType} ledger number is required.`);
+    }
+
+    assignments[key] = { gl: glNumber, type: ledgerType, ledgerNumber: ledgerNumber, name: key };
+  });
+
+  return { assignments, errors };
+}
+
+function buildGbat10(rows, bankAccount) {
+  const outRows = [];
+  let voucherNumber = null;
+
+  rows.forEach(row => {
+    if (voucherNumber === null) {
+      voucherNumber = row.date.slice(0, 6) + "01";
+    }
+
+    const counter = counterpartyAssignments[row.key];
+    const glNumber = counter ? counter.gl : "";
+    const customerNumber = counter && counter.type === "AR" ? counter.ledgerNumber : "";
+    const supplierNumber = counter && counter.type === "AP" ? counter.ledgerNumber : "";
+    const customerName = counter && counter.type === "AR" ? counter.name : "";
+    const supplierName = counter && counter.type === "AP" ? counter.name : "";
+
+    let debetkto, kreditkto;
+    let debetCustomer = "", debetSupplier = "", debetCustomerName = "", debetSupplierName = "";
+    let kreditCustomer = "", kreditSupplier = "", kreditCustomerName = "", kreditSupplierName = "";
+
+    if (row.amount >= 0) {
+      debetkto = bankAccount;
+      kreditkto = glNumber;
+      kreditCustomer = customerNumber;
+      kreditSupplier = supplierNumber;
+      kreditCustomerName = customerName;
+      kreditSupplierName = supplierName;
+    } else {
+      debetkto = glNumber;
+      debetCustomer = customerNumber;
+      debetSupplier = supplierNumber;
+      debetCustomerName = customerName;
+      debetSupplierName = supplierName;
+      kreditkto = bankAccount;
+    }
+
+    const amount = Math.abs(row.amount);
+
+    const debetRow = [
+      "GBAT10", voucherNumber, row.date, "", "", "",
+      debetkto, "", "", debetCustomer, debetSupplier,
+      (debetCustomerName || debetSupplierName), "", "", "",
+      "", "", "", "", "", row.description, "", "", "", "",
+      "", "T", formatGbatAmount(amount), ""
+    ];
+
+    const kreditRow = [
+      "GBAT10", voucherNumber, row.date, "", "", "",
+      kreditkto, "", "", kreditCustomer, kreditSupplier,
+      (kreditCustomerName || kreditSupplierName), "", "", "",
+      "", "", "", "", "", row.description, "", "", "", "",
+      "", "T", formatGbatAmount(-amount), ""
+    ];
+
+    outRows.push(debetRow);
+    outRows.push(kreditRow);
+  });
+
+  return outRows.map(row => row.join(";")).join("\r\n");
+}
+
+document.getElementById("fileInput").addEventListener("change", function (event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const rows = parseWiseCsv(e.target.result);
+    if (!rows) {
+      document.getElementById("counterpartyPanel").style.display = "none";
+      document.getElementById("downloadBtn").disabled = true;
+      return;
+    }
+
+    parsedRows = rows;
+    outputFileName = file.name.replace(/\.[^/.]+$/, "") + "_GBAT10.txt";
+
+    const keys = getUniqueCounterparties(rows);
+    renderCounterpartyPanel(keys);
+    document.getElementById("counterpartyError").style.display = "none";
+    document.getElementById("downloadBtn").disabled = true;
+    outputCsv = null;
+  };
+  reader.readAsText(file, "utf-8");
+});
+
+document.getElementById("applyCounterparties").addEventListener("click", function () {
+  const keys = getUniqueCounterparties(parsedRows);
+  const { assignments, errors } = collectCounterpartyAssignments(keys);
+
+  const errorEl = document.getElementById("counterpartyError");
+
+  if (errors.length > 0) {
+    errorEl.innerHTML = errors.join("<br>");
+    errorEl.style.display = "block";
+    document.getElementById("downloadBtn").disabled = true;
+    outputCsv = null;
+    return;
+  }
+
+  errorEl.style.display = "none";
+  counterpartyAssignments = assignments;
+
+  const bankAccount = document.getElementById("bankAccount").value.trim() || "1920";
+  outputCsv = buildGbat10(parsedRows, bankAccount);
+  document.getElementById("downloadBtn").disabled = false;
+});
+
+document.getElementById("downloadBtn").addEventListener("click", function () {
+  if (!outputCsv) return;
+  const bytes = encodeIso88591(outputCsv);
+  const blob = new Blob([bytes], { type: "text/csv;charset=iso-8859-1;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = outputFileName;
+  a.click();
+  URL.revokeObjectURL(url);
+});
+</script>
+</body>
+</html>
